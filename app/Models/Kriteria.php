@@ -11,7 +11,7 @@ class Kriteria extends Model
 
     protected $table = 'kriteria';
 
-    protected $fillable = ['nama_kriteria','nilai'];
+    protected $fillable = ['nama_kriteria'];
 
     public function penerimaanZakat()
     {

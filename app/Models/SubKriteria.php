@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,8 +12,22 @@ class SubKriteria extends Model
 
     protected $fillable = ['kriteria_id', 'sub_kriteria_name', 'nilai'];
 
+    /**
+     * The kriteria that this sub-kriteria belongs to.
+     */
     public function kriteria()
     {
         return $this->belongsTo(Kriteria::class);
     }
+
+    /**
+     * The penerimaan zakat associated with this sub-kriteria.
+     */
+    public function penerimaanZakat()
+    {
+        return $this->belongsToMany(PenerimaanZakat::class, 'penerimaan_zakat_sub_kriteria')
+                    ->withPivot('nilai')
+                    ->withTimestamps();
+    }
 }
+

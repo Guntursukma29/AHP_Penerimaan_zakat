@@ -79,7 +79,10 @@
                                         class="form-control">
                                         <option value="">Select Sub Kriteria</option>
                                         @foreach ($kriterium->subKriteria as $sub)
-                                            <option value="{{ $sub->id }}">{{ $sub->sub_kriteria_name }}</option>
+                                            <option value="{{ $sub->id }}"
+                                                {{ $data->subKriteria->firstWhere('id', $sub->id) ? 'selected' : '' }}>
+                                                {{ $sub->sub_kriteria_name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>

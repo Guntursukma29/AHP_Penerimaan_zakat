@@ -14,8 +14,7 @@ class CreateSubKriteriaTable extends Migration
         Schema::create('sub_kriteria', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kriteria_id')->constrained('kriteria')->onDelete('cascade');
-            $table->string('sub_kriteria_name');
-            $table->integer('nilai');
+            $table->string('sub_kriteria_name')->nullable();            $table->integer('nilai');
             $table->timestamps();
         });
     }

@@ -31,7 +31,7 @@ class KriteriaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['nama_kriteria' => 'required','nilai' => 'required|integer']);
+        $request->validate(['nama_kriteria' => 'required']);
         Kriteria::create($request->all());
         return redirect()->back()->with('success', 'Kriteria added successfully');
     }

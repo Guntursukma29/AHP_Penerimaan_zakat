@@ -17,6 +17,16 @@ class PenerimaanZakat extends Model
 
     public function kriteria()
     {
-        return $this->belongsToMany(Kriteria::class, 'kriteria_penerima_zakat')->withPivot('nilai')->withTimestamps();
+        return $this->belongsToMany(Kriteria::class, 'kriteria_penerima_zakat')
+                    ->withPivot('nilai')
+                    ->withTimestamps();
     }
+
+    public function subKriteria()
+    {
+        return $this->belongsToMany(SubKriteria::class, 'penerimaan_zakat_sub_kriteria')
+                    ->withPivot('kriteria_id', 'nilai')
+                    ->withTimestamps();
+    }
+
 }

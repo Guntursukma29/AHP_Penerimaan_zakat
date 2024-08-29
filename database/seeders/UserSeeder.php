@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PenerimaanZakat;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
