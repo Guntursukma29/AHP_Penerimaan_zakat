@@ -18,8 +18,17 @@ class Kriteria extends Model
         return $this->belongsToMany(PenerimaanZakat::class, 'kriteria_penerima_zakat')->withPivot('nilai')->withTimestamps();
     }
     public function subKriteria()
-{
-    return $this->hasMany(SubKriteria::class);
-}
+    {
+        return $this->hasMany(SubKriteria::class);
+    }
 
+    public function perbandingan1()
+    {
+        return $this->hasMany(PerbandinganKriteria::class, 'kriteria1_id');
+    }
+
+    public function perbandingan2()
+    {
+        return $this->hasMany(PerbandinganKriteria::class, 'kriteria2_id');
+    }
 }

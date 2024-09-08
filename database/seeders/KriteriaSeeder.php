@@ -17,9 +17,9 @@ class KriteriaSeeder extends Seeder
         $kriteria = [
             'Pekerjaan',
             'Penghasilan',
-            'Kondisi Kesehatan',
             'Tempat Tinggal',
-            'Tanggungan Keluarga'
+            'Tanggungan Keluarga',
+            'Kondisi Kesehatan'
         ];
 
         foreach ($kriteria as $namaKriteria) {

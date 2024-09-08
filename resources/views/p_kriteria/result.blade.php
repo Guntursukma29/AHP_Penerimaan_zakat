@@ -4,9 +4,9 @@
     <div class="container mt-5">
         <div class="card">
             <div class="card-body">
-                <h5 class="text-center mt-2 mb-4">MATRIK PERBANDINGAN BERPASANGAN</h5>
+                <h5 class="text-center mt-2 mb-4">Matriks Perbandingan Berpasangan</h5>
                 <div class="table-responsive">
-                    <!-- Matrik Perbandingan Berpasangan -->
+                    <!-- Matriks Perbandingan Berpasangan -->
                     <table class="table table-bordered text-center">
                         <thead class="thead-dark">
                             <tr>
@@ -14,30 +14,31 @@
                                 @foreach ($kriteria as $k)
                                     <th>{{ $k->nama_kriteria }}</th>
                                 @endforeach
-                                <th>Jumlah</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($kriteria as $i => $k1)
-                                <tr>
-                                    <td class="font-weight-bold">{{ $k1->nama_kriteria }}</td>
-                                    @foreach ($kriteria as $j => $k2)
-                                        <td>{{ number_format($comparisonMatrix[$i][$j] ?? 0, 3) }}</td>
-                                    @endforeach
-                                    <td>{{ number_format(array_sum($comparisonMatrix[$i] ?? []), 3) }}</td>
-                                </tr>
+                            <tr>
+                                <td class="font-weight-bold">{{ $k1->nama_kriteria }}</td>
+                                @foreach ($kriteria as $j => $k2)
+                                    @php
+                                        $value = $comparisonMatrix[$i][$j] ?? 0;
+                                    @endphp
+                                    <td>{{ $value }}</td>
+                                @endforeach
+                            </tr>
                             @endforeach
-
+                            
                             <!-- Jumlah Row -->
                             <tr class="font-weight-bold">
                                 <td>Jumlah</td>
-                                @foreach ($columnSums as $sum)
-                                    <td>{{ number_format($sum ?? 0, 3) }}</td>
-                                @endforeach
-                                <td></td>
+                                {{-- @foreach ($columnSums as $sum)
+                                    <td>{{$sum}}</td>
+                                @endforeach --}}
                             </tr>
                         </tbody>
                     </table>
+                    
 
                     <!-- Matriks Nilai Kriteria -->
                     <h5 class="text-center mt-4 mb-4">Matriks Nilai Kriteria</h5>
@@ -49,7 +50,7 @@
                                     <th>{{ $k->nama_kriteria }}</th>
                                 @endforeach
                                 <th>Jumlah</th>
-                                <th>Priority Vektor</th>
+                                <th>Vektor Prioritas</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,22 +67,22 @@
                         </tbody>
                     </table>
 
-                    <!-- Consistency and Eigenvalue Information -->
+                    <!-- Konsistensi dan Informasi Eigenvalue -->
                     <div class="mt-4">
                         <p><strong>Prinsip Eigen Vektor (Lambda Max):</strong> {{ number_format($lambdaMax, 5) }}</p>
-                        <p><strong>Consistency Index:</strong> {{ number_format($ci, 5) }}</p>
-                        <p><strong>Consistency Ratio:</strong> {{ number_format($cr, 5) }}</p>
+                        <p><strong>Indeks Konsistensi:</strong> {{ number_format($ci, 5) }}</p>
+                        <p><strong>Rasio Konsistensi:</strong> {{ number_format($cr, 5) }}</p>
                     </div>
 
-                    <!-- Warning Message -->
+                    <!-- Pesan Peringatan -->
                     @if ($cr > 0.1)
                         <div class="alert alert-danger text-center" role="alert">
-                            <strong>Nilai consistency ratio melebihi 10%</strong><br>
-                            Mohon input kembali tabel perbandingan.
+                            <strong>Nilai Rasio Konsistensi melebihi 10%</strong><br>
+                            Silakan input kembali tabel perbandingan.
                         </div>
                     @endif
 
-                    <!-- Kembali Button -->
+                    <!-- Tombol Kembali -->
                     <div class="text-center">
                         <a href="{{ route('perbandingankriteria.index') }}" class="btn btn-secondary">Kembali</a>
                     </div>

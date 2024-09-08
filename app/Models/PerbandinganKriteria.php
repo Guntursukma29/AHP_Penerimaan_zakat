@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class PerbandinganKriteria extends Model
+{
+    use HasFactory;
+
+    protected $table = 'perbandingan_kriteria';
+
+    protected $fillable = [
+        'kriteria1_id',
+        'kriteria2_id',
+        'selected_kriteria_id',
+        'nilai',
+    ];
+    public function kriteria1()
+    {
+        return $this->belongsTo(Kriteria::class, 'kriteria1_id');
+    }
+
+    public function kriteria2()
+    {
+        return $this->belongsTo(Kriteria::class, 'kriteria2_id');
+    }
+
+    public function selectedKriteria()
+    {
+        return $this->belongsTo(Kriteria::class, 'selected_kriteria_id');
+    }
+
+}
