@@ -159,27 +159,27 @@
 
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="layouts-without-menu.html" class="menu-link">
+                                <a href="{{ route('perbandinganpekerjaan') }}" class="menu-link">
                                     <div data-i18n="Without menu">Pekerjaan</div>
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="layouts-without-navbar.html" class="menu-link">
+                                <a href="{{ route('perbandinganpenghasilan') }}" class="menu-link">
                                     <div data-i18n="Without navbar">Penghasilan</div>
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="layouts-container.html" class="menu-link">
+                                <a href="{{ route('perbandingantempattinggal') }}" class="menu-link">
                                     <div data-i18n="Container">Tempat Tinggal</div>
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="layouts-fluid.html" class="menu-link">
+                                <a href="{{ route('perbandingantanggungankeluarga') }}" class="menu-link">
                                     <div data-i18n="Fluid">Tanggungan Keluarga </div>
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="layouts-blank.html" class="menu-link">
+                                <a href="{{ route('perbandingankondisikesehatan') }}" class="menu-link">
                                     <div data-i18n="Blank">Kondisi Kesehatan</div>
                                 </a>
                             </li>
