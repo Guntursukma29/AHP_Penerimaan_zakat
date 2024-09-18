@@ -12,7 +12,7 @@ class PerbandinganTempatTinggalController extends Controller
     public function index()
     {
         // Ambil kriteria "Pekerjaan" beserta sub-kriteria
-        $kriteria = Kriteria::with('subKriteria')->where('nama_kriteria', 'Pekerjaan')->first();
+        $kriteria = Kriteria::with('subKriteria')->where('nama_kriteria', 'Tempat Tinggal')->first();
         
         // Ambil data penerimaan zakat
         $penerimaanzakat = PenerimaanZakat::all();

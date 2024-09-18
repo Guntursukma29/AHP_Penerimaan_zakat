@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\AlternatifController;
 use App\Http\Controllers\SubKriteriaController;
+use App\Http\Controllers\PerangkinganController;
 use App\Http\Controllers\PenerimaanZakatController;
 use App\Http\Controllers\PerbandinganKriteriaController;
 use App\Http\Controllers\PerbandinganPekerjaanController;
@@ -42,5 +43,7 @@ Route::get('/perbandingan-tanggungankeluarga', [PerbandinganTanggunganKeluargaCo
 Route::post('/submit-perbandingantanggungankeluarga', [PerbandinganTanggunganKeluargaController::class, 'store']);
 Route::get('/perbandingan-kondisikesehatan', [PerbandinganKondisiKesehatanController::class, 'index'])->name('perbandingankondisikesehatan');
 Route::post('/submit-perbandingankondisikesehatan', [PerbandinganKondisiKesehatanController::class, 'store']);
+Route::get('/hasil-perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan');
+
 
 
