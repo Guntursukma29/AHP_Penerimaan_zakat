@@ -97,7 +97,7 @@
                         <tr>
                             <td><strong>Total</strong></td>
                             @foreach ($columnTotals as $total)
-                                <td><strong>{{ number_format($total, 2) + 1 }} </strong></td>
+                                <td><strong>{{ number_format($total, 2) }} </strong></td>
                             @endforeach
                         </tr>
                     </tbody>

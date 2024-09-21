@@ -16,7 +16,7 @@ use App\Http\Controllers\PerbandinganKondisiKesehatanController;
 use App\Http\Controllers\PerbandinganTanggunganKeluargaController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Auth::routes();

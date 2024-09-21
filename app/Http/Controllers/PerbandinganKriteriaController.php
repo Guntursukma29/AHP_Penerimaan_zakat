@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Kriteria;
@@ -10,20 +11,23 @@ class PerbandinganKriteriaController extends Controller
     public function index()
     {
         $kriteria = Kriteria::all();
-        $size = $kriteria->count();  
-        $matrix = $this->initializeMatrix($size);  
+        $size = $kriteria->count();
+        $matrix = $this->initializeMatrix($size);
         $columnTotals = array_fill(0, $size, 0);
 
         $perbandinganKriteria = PerbandinganKriteria::all();
-        
+       
         $this->fillMatrixAndColumnTotals($perbandinganKriteria, $matrix, $columnTotals);
+        $columnTotals = array_map(function($value) {
+            return $value + 1;
+        }, $columnTotals);
         $normalizedMatrix = $this->calculateNormalizedMatrix($matrix, $columnTotals, $size);
         $eigenVector = $this->calculateEigenVector($normalizedMatrix, $size);
         $lambdaMax = $this->calculateLambdaMax($columnTotals, $eigenVector, $size);
         $sumEigenVector = array_sum($eigenVector);
 
         $ci = ($lambdaMax - $size) / ($size - 1);
-        $ir = 1.12; 
+        $ir = 1.12;
         $cr = $ci / $ir;
 
         $perbandinganArray = $this->getPerbandinganArray($perbandinganKriteria);
@@ -79,8 +83,11 @@ class PerbandinganKriteriaController extends Controller
             }
 
             $columnTotals[$j] += $matrix[$i][$j];
+            $columnTotals[$i] += $matrix[$j][$i];
         }
+
     }
+
     private function calculateNormalizedMatrix($matrix, $columnTotals, $size)
     {
         $normalizedMatrix = array_fill(0, $size, array_fill(0, $size, 0));
