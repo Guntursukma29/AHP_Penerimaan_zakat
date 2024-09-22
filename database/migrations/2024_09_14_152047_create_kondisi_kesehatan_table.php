@@ -19,8 +19,8 @@ return new class extends Migration
             $table->decimal('nilai', 8, 2);
             $table->timestamps();
 
-            $table->foreign('kriteria1_id')->references('id')->on('kriteria')->onDelete('cascade');
-            $table->foreign('kriteria2_id')->references('id')->on('kriteria')->onDelete('cascade');
+            $table->foreign('kriteria1_id')->references('id')->on('data_penerima_zakat')->onDelete('cascade');
+            $table->foreign('kriteria2_id')->references('id')->on('data_penerima_zakat')->onDelete('cascade');
             $table->foreign('selected_kriteria_id')->references('id')->on('kriteria')->onDelete('cascade');
         });
     }

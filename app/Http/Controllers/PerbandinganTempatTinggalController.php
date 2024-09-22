@@ -5,26 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Kriteria;
 use Illuminate\Http\Request;
 use App\Models\PenerimaanZakat;
-use App\Models\PerbandinganTempatTinggal;
+use App\Models\perbandinganTempatTinggal;
 
-class PerbandinganTempatTinggalController extends Controller
+class perbandinganTempatTinggalController extends Controller
 {
     public function index()
     {
-        // Ambil kriteria "Pekerjaan" beserta sub-kriteria
-        $kriteria = Kriteria::with('subKriteria')->where('nama_kriteria', 'Tempat Tinggal')->first();
-        
-        // Ambil data penerimaan zakat
+        $kriteria = Kriteria::with('subKriteria')->where('nama_kriteria', 'tempattinggal')->first();
         $penerimaanzakat = PenerimaanZakat::all();
-
-
-        $size = $penerimaanzakat->count();  
-        $matrix = $this->initializeMatrix($size);  
+        $size = $penerimaanzakat->count();
+        $matrix = $this->initializeMatrix($size);
         $columnTotals = array_fill(0, $size, 0);
-        $perbadingantempattinggal = PerbandinganTempatTinggal::all();
+        $perbandinganTempatTinggal = perbandinganTempatTinggal::all();
 
-        // Mengisi matriks dan total kolom
-        $this->fillMatrixAndColumnTotals($perbadingantempattinggal, $matrix, $columnTotals);
+        $idToIndex = [];
+        foreach ($penerimaanzakat as $index => $pz) {
+            $idToIndex[$pz->id] = $index;
+        }
+
+        $this->fillMatrixAndColumnTotals($perbandinganTempatTinggal, $matrix, $columnTotals, $idToIndex);
 
         foreach ($columnTotals as $index => $total) {
             if ($total == 0) {
@@ -32,60 +31,71 @@ class PerbandinganTempatTinggalController extends Controller
             }
         }
 
-        // Hitung matriks normalisasi
         $normalizedMatrix = $this->calculateNormalizedMatrix($matrix, $columnTotals, $size);
         $eigenVector = $this->calculateEigenVector($normalizedMatrix, $size);
         $lambdaMax = $this->calculateLambdaMax($columnTotals, $eigenVector, $size);
         $sumEigenVector = array_sum($eigenVector);
-
         $ci = ($lambdaMax - $size) / ($size - 1);
-        $ir = 1.12; // Nilai Random Index untuk ukuran matriks 4-6
+        $ir = 1.12;
         $cr = $ci / $ir;
+        $perbandinganArray = $this->getPerbandinganArray($perbandinganTempatTinggal);
 
-        // Ambil data perbandingan untuk form
-        $perbandinganArray = $this->getPerbandinganArray($perbadingantempattinggal);
-
-        return view('p_alternatif.tempattinggal', compact('penerimaanzakat', 'matrix', 'columnTotals', 'normalizedMatrix', 'eigenVector', 'lambdaMax', 'ci', 'cr', 'sumEigenVector', 'perbandinganArray', 'kriteria'));
+        return view('p_alternatif.tempattinggal', compact(
+            'penerimaanzakat',
+            'matrix',
+            'columnTotals',
+            'normalizedMatrix',
+            'eigenVector',
+            'lambdaMax',
+            'ci',
+            'cr',
+            'sumEigenVector',
+            'perbandinganArray',
+            'kriteria'
+        ));
     }
 
     public function store(Request $request)
-    {foreach ($request->kriteria as $kriteria1Id => $kriteriaPairs) {
-        foreach ($kriteriaPairs as $kriteria2Id => $selectedKriteriaId) {
-            $nilai = $request->nilai[$kriteria1Id][$kriteria2Id];
+    {
+        foreach ($request->kriteria as $kriteria1Id => $kriteriaPairs) {
+            foreach ($kriteriaPairs as $kriteria2Id => $selectedKriteriaId) {
+                $nilai = $request->nilai[$kriteria1Id][$kriteria2Id];
+                $existingComparison = perbandinganTempatTinggal::where('kriteria1_id', $kriteria1Id)
+                    ->where('kriteria2_id', $kriteria2Id)
+                    ->first();
 
-            $existingComparison = PerbandinganTempatTinggal::where('kriteria1_id', $kriteria1Id)
-                ->where('kriteria2_id', $kriteria2Id)
-                ->first();
-
-            if ($existingComparison) {
-                $existingComparison->update([
-                    'selected_kriteria_id' => $selectedKriteriaId,
-                    'nilai' => $nilai,
-                ]);
-            } else {
-                PerbandinganTempatTinggal::create([
-                    'kriteria1_id' => $kriteria1Id,
-                    'kriteria2_id' => $kriteria2Id,
-                    'selected_kriteria_id' => $selectedKriteriaId,
-                    'nilai' => $nilai,
-                ]);
+                if ($existingComparison) {
+                    $existingComparison->update([
+                        'selected_kriteria_id' => $selectedKriteriaId,
+                        'nilai' => $nilai,
+                    ]);
+                } else {
+                    perbandinganTempatTinggal::create([
+                        'kriteria1_id' => $kriteria1Id,
+                        'kriteria2_id' => $kriteria2Id,
+                        'selected_kriteria_id' => $selectedKriteriaId,
+                        'nilai' => $nilai,
+                    ]);
+                }
             }
         }
-    }
 
-    return redirect()->back()->with('success', 'Perbandingan kriteria berhasil disimpan.');
-}
+        return redirect()->back()->with('success', 'Perbandingan tempattinggal berhasil disimpan.');
+    }
 
     private function initializeMatrix($size)
     {
         return array_fill(0, $size, array_fill(0, $size, 1));
     }
 
-    private function fillMatrixAndColumnTotals($perbadingantempattinggal, &$matrix, &$columnTotals)
+    private function fillMatrixAndColumnTotals($perbandinganTempatTinggal, &$matrix, &$columnTotals, $idToIndex)
     {
-        foreach ($perbadingantempattinggal as $perbandingan) {
-            $i = $perbandingan->kriteria1_id - 1;
-            $j = $perbandingan->kriteria2_id - 1;
+        foreach ($perbandinganTempatTinggal as $perbandingan) {
+            if (!isset($idToIndex[$perbandingan->kriteria1_id]) || !isset($idToIndex[$perbandingan->kriteria2_id])) {
+                continue;
+            }
+            $i = $idToIndex[$perbandingan->kriteria1_id];
+            $j = $idToIndex[$perbandingan->kriteria2_id];
 
             if ($perbandingan->selected_kriteria_id == $perbandingan->kriteria1_id) {
                 $matrix[$i][$j] = round($perbandingan->nilai, 2);
@@ -96,6 +106,7 @@ class PerbandinganTempatTinggalController extends Controller
             }
 
             $columnTotals[$j] += $matrix[$i][$j];
+            $columnTotals[$i] += $matrix[$j][$i];
         }
     }
 
@@ -131,14 +142,13 @@ class PerbandinganTempatTinggalController extends Controller
         return $lambdaMax;
     }
 
-    private function getPerbandinganArray($perbadingantempattinggal)
+    private function getPerbandinganArray($perbandinganTempatTinggal)
     {
         $perbandinganArray = [];
-        foreach ($perbadingantempattinggal as $perbandingan) {
+        foreach ($perbandinganTempatTinggal as $perbandingan) {
             $key = $perbandingan->kriteria1_id . '-' . $perbandingan->kriteria2_id;
             $perbandinganArray[$key] = $perbandingan;
         }
         return $perbandinganArray;
     }
-
 }

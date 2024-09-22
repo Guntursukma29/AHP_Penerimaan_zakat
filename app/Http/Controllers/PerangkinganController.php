@@ -2,118 +2,106 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Helpers\ComparisonHelper;
+use App\Models\Kriteria;
+use App\Models\PerbandinganKriteria;
 use App\Models\PerbandinganPekerjaan;
 use App\Models\PerbandinganPenghasilan;
 use App\Models\PerbandinganTempatTinggal;
 use App\Models\PerbandinganKondisiKesehatan;
 use App\Models\PerbandinganTanggunganKeluarga;
 use App\Models\PenerimaanZakat;
+use Illuminate\Http\Request;
 
 class PerangkinganController extends Controller
 {
     public function index()
     {
-        // Mengambil data dari setiap tabel
-        $pekerjaan = PerbandinganPekerjaan::all();
-        $penghasilan = PerbandinganPenghasilan::all();
-        $tempatTinggal = PerbandinganTempatTinggal::all();
-        $tanggunganKeluarga = PerbandinganTanggunganKeluarga::all();
-        $kondisiKesehatan = PerbandinganKondisiKesehatan::all();
-        
-        // Mengambil data penerimaan zakat
-        $penerimaanZakat = PenerimaanZakat::all();
+        $rataRataKriteria = $this->getRataRataKriteria();
+        $hasilRataRata = $this->getHasilRataRata();
 
-        // Perhitungan AHP untuk setiap tabel
-        $pekerjaanResult = $this->calculateAHP($pekerjaan);
-        $penghasilanResult = $this->calculateAHP($penghasilan);
-        $tempatTinggalResult = $this->calculateAHP($tempatTinggal);
-        $tanggunganKeluargaResult = $this->calculateAHP($tanggunganKeluarga);
-        $kondisiKesehatanResult = $this->calculateAHP($kondisiKesehatan);
+        $ranking = $this->calculateRanking($hasilRataRata, $rataRataKriteria);
 
-        // Menyusun hasil perangkingan dengan data penerima zakat
-        $ranking = $this->calculateRanking(
-            $pekerjaanResult,
-            $penghasilanResult,
-            $tempatTinggalResult,
-            $tanggunganKeluargaResult,
-            $kondisiKesehatanResult,
-            $penerimaanZakat
-        );
-
-        // Return hasil ke view
-        return view('hasil.perangkingan', compact(
-            'pekerjaanResult',
-            'penghasilanResult',
-            'tempatTinggalResult',
-            'tanggunganKeluargaResult',
-            'kondisiKesehatanResult',
-            'ranking',
-            'penerimaanZakat'
-        ));
+        return view('hasil.perangkingan', [
+            'hasilRataRata' => $hasilRataRata,
+            'rataRataKriteria' => $rataRataKriteria,
+            'ranking' => $ranking,
+        ]);
     }
 
-    // Fungsi untuk melakukan perhitungan AHP
-    private function calculateAHP($comparisons)
-{
-    $matrix = [];
-    $total = [];
-
-    // Membuat matriks perbandingan
-    foreach ($comparisons as $comparison) {
-        $matrix[$comparison->kriteria1_id][$comparison->kriteria2_id] = $comparison->nilai;
-    }
-
-    // Menambahkan jumlah kolom di setiap baris untuk normalisasi
-    foreach ($matrix as $kriteria => $values) {
-        $total[$kriteria] = array_sum($values);
-    }
-
-    // Normalisasi matriks
-    foreach ($matrix as $kriteria => $values) {
-        foreach ($values as $k2 => $value) {
-            $matrix[$kriteria][$k2] = $value / $total[$k2];
-        }
-    }
-
-    // Hitung rata-rata untuk mendapatkan prioritas
-    $priority = [];
-    foreach ($matrix as $kriteria => $values) {
-        $priority[$kriteria] = array_sum($values) / count($values);
-    }
-
-    // Tambahkan nilai prioritas untuk setiap penerima zakat (memastikan semua ID penerima zakat ada)
-    $result = [];
-    foreach ($comparisons as $comparison) {
-        $result[$comparison->penerima_id] = $priority[$comparison->kriteria1_id] ?? 0;
-    }
-
-    return $result;
-}
-
-
-    // Fungsi untuk menghitung ranking berdasarkan hasil AHP
-    private function calculateRanking($pekerjaanResult, $penghasilanResult, $tempatTinggalResult, $tanggunganKeluargaResult, $kondisiKesehatanResult, $penerimaanZakat)
+    private function getRataRataKriteria()
     {
-        $ranking = [];
+        $kriteria = Kriteria::all();
+        $size = $kriteria->count();
+        $perbandinganKriteria = PerbandinganKriteria::all();
 
-        foreach ($penerimaanZakat as $penerima) {
-            $ranking[$penerima->id] = [
-                'nama' => $penerima->nama,
-                'total_nilai' => (
-                    ($pekerjaanResult[$penerima->id] ?? 0) +
-                    ($penghasilanResult[$penerima->id] ?? 0) +
-                    ($tempatTinggalResult[$penerima->id] ?? 0) +
-                    ($tanggunganKeluargaResult[$penerima->id] ?? 0) +
-                    ($kondisiKesehatanResult[$penerima->id] ?? 0)
-                )
+        $calculations = ComparisonHelper::calculateComparison($size, $kriteria, $perbandinganKriteria);
+        $eigenVector = $calculations['eigenVector'];
+
+        return $this->mapKriteriaToEigenVector($kriteria, $eigenVector);
+    }
+
+    private function mapKriteriaToEigenVector($kriteria, $eigenVector)
+    {
+        $rataRataKriteria = [];
+        foreach ($kriteria as $key => $k) {
+            $rataRataKriteria[$k->nama_kriteria] = $eigenVector[$key] ?? 0;
+        }
+
+        return $rataRataKriteria;
+    }
+
+    private function getHasilRataRata()
+    {
+        $penerimaZakat = PenerimaanZakat::all();
+        $hasilRataRata = [];
+
+        foreach ($penerimaZakat as $penerima) {
+            $hasilRataRata[] = [
+                'penerima' => $penerima->nama,
+                'rata_pekerjaan' => $this->calculateRata('Pekerjaan', $penerima->id),
+                'rata_penghasilan' => $this->calculateRata('Penghasilan', $penerima->id),
+                'rata_tempattinggal' => $this->calculateRata('Tempat Tinggal', $penerima->id),
+                'rata_kondisi_kesehatan' => $this->calculateRata('Kondisi Kesehatan', $penerima->id),
+                'rata_tanggungan_keluarga' => $this->calculateRata('Tanggungan Keluarga', $penerima->id),
             ];
         }
 
-        // Urutkan berdasarkan total nilai (ranking tertinggi di atas)
-        usort($ranking, function ($a, $b) {
-            return $b['total_nilai'] <=> $a['total_nilai'];
-        });
+        return $hasilRataRata;
+    }
+
+    private function calculateRata($type, $id)
+    {
+        $modelClass = 'App\\Models\\Perbandingan' . str_replace(' ', '', ucwords(strtolower($type)));
+        $perbandingan = $modelClass::all();
+        $size = PenerimaanZakat::count();
+
+        $calculations = ComparisonHelper::calculateComparison($size, PenerimaanZakat::all(), $perbandingan);
+        $eigenVector = $calculations['eigenVector'];
+
+        return $eigenVector[$id] ?? 0;
+    }
+
+    private function calculateRanking($hasilRataRata, $rataRataKriteria)
+    {
+        $ranking = [];
+
+        foreach ($hasilRataRata as $rata) {
+            $total = (
+                $rata['rata_pekerjaan'] * $rataRataKriteria['Pekerjaan'] +
+                $rata['rata_penghasilan'] * $rataRataKriteria['Penghasilan'] +
+                $rata['rata_tempattinggal'] * $rataRataKriteria['Tempat Tinggal'] +
+                $rata['rata_kondisi_kesehatan'] * $rataRataKriteria['Kondisi Kesehatan'] +
+                $rata['rata_tanggungan_keluarga'] * $rataRataKriteria['Tanggungan Keluarga']
+            );
+
+            $ranking[] = [
+                'penerima' => $rata['penerima'],
+                'total' => $total,
+            ];
+        }
+
+        usort($ranking, fn($a, $b) => $b['total'] <=> $a['total']);
 
         return $ranking;
     }

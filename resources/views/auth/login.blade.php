@@ -30,17 +30,6 @@
             <div class="authentication-inner">
                 <div class="card">
                     <div class="card-body">
-                        <div class="app-brand justify-content-center">
-                            <a href="{{ url('index.html') }}" class="app-brand-link gap-2">
-                                <span class="app-brand-logo demo">
-                                    <!-- SVG Logo Here -->
-                                </span>
-                                <span class="app-brand-text demo text-body fw-bolder">Sneat</span>
-                            </a>
-                        </div>
-                        <h4 class="mb-2">Welcome to Sneat! 👋</h4>
-                        <p class="mb-4">Please sign-in to your account and start the adventure</p>
-
                         <form id="formAuthentication" class="mb-3" method="POST" action="{{ route('login') }}">
                             @csrf
 
@@ -81,28 +70,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember"
-                                        {{ old('remember') ? 'checked' : '' }} />
-                                    <label class="form-check-label" for="remember-me"> Remember Me </label>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
                                 <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                             </div>
                         </form>
-
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <p class="text-center">
-                                    <span>{{ __('New on our platform?') }}</span>
-                                    <a class="btn btn-link" href="{{ route('register') }}">
-                                        {{ __('Create an account') }}
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

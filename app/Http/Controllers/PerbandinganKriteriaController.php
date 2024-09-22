@@ -18,9 +18,6 @@ class PerbandinganKriteriaController extends Controller
         $perbandinganKriteria = PerbandinganKriteria::all();
        
         $this->fillMatrixAndColumnTotals($perbandinganKriteria, $matrix, $columnTotals);
-        $columnTotals = array_map(function($value) {
-            return $value + 1;
-        }, $columnTotals);
         $normalizedMatrix = $this->calculateNormalizedMatrix($matrix, $columnTotals, $size);
         $eigenVector = $this->calculateEigenVector($normalizedMatrix, $size);
         $lambdaMax = $this->calculateLambdaMax($columnTotals, $eigenVector, $size);
