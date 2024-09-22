@@ -15,8 +15,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($penerimaZakat as $k1)
-                                @foreach ($penerimaZakat as $k2)
+                            @foreach ($penerimaanzakat as $k1)
+                                @foreach ($penerimaanzakat as $k2)
                                     @if ($k1->id < $k2->id)
                                         @php
                                             $key = $k1->id . '-' . $k2->id;
@@ -78,21 +78,21 @@
                 <thead>
                     <tr>
                         <th>Kriteria</th>
-                        @foreach ($penerimaZakat as $k)
+                        @foreach ($penerimaanzakat as $k)
                             <th>{{ $k->nama }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($penerimaZakat as $i => $k1)
+                    @foreach ($penerimaanzakat as $i => $k1)
                         <tr>
                             <td>{{ $k1->nama }}</td>
-                            @foreach ($penerimaZakat as $j => $k2)
+                            @foreach ($penerimaanzakat as $j => $k2)
                                 <td>
                                     @if (intval($matrix[$i][$j]) == $matrix[$i][$j])
                                         {{ intval($matrix[$i][$j]) }} {{-- Tampilkan tanpa desimal jika bilangan bulat --}}
                                     @else
-                                        {{ number_format($matrix[$i][$j], 2) }} {{-- Tampilkan dengan 2 desimal jika ada desimal yang bukan nol --}}
+                                        {{ number_format($matrix[$i][$j], 2) }} {{-- Tampilkan dengan 2 desimal jika ada desimal --}}
                                     @endif
                                 </td>
                             @endforeach
@@ -101,46 +101,47 @@
                     <tr>
                         <td><strong>Total</strong></td>
                         @foreach ($columnTotals as $total)
-                            <td><strong>{{ number_format($total, 2) + 1 }} </strong></td>
+                            <td><strong>{{ number_format($total, 2) }}</strong></td> {{-- Tampilkan total kolom dengan 2 desimal --}}
                         @endforeach
                     </tr>
                 </tbody>
-            </table>
 
+            </table>
         </div>
     </div>
 
     <div class="card my-3">
-        <h5 class="text-center mt-4">Normalisasi </h5>
+        <h5 class="text-center mt-4">Normalisasi</h5>
         <div class="card-body">
             <table class="table table-bordered my-3">
                 <thead>
                     <tr>
                         <th>Kriteria</th>
-                        @foreach ($penerimaZakat as $krit)
+                        @foreach ($penerimaanzakat as $krit)
                             <th>{{ $krit->nama }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @for ($i = 0; $i < count($normalizedMatrix); $i++)
+                    @foreach ($normalizedMatrix as $i => $row)
                         <tr>
-                            <td>{{ $penerimaZakat[$i]->nama }}</td>
-                            @for ($j = 0; $j < count($normalizedMatrix[$i]); $j++)
-                                <td>{{ number_format($normalizedMatrix[$i][$j], 6) }}</td>
-                            @endfor
+                            <td>{{ $penerimaanzakat[$i]->nama }}</td>
+                            @foreach ($row as $j => $value)
+                                <td>{{ number_format($value, 6) }}</td>
+                            @endforeach
                         </tr>
-                    @endfor
+                    @endforeach
                 </tbody>
             </table>
 
-            <h5>Rata Rata (Prioritas Bobot)</h5>
+            <h5>Rata-rata (Prioritas Bobot)</h5>
             <ul>
                 @foreach ($eigenVector as $index => $eigen)
-                    <li>{{ $penerimaZakat[$index]->nama }}: {{ number_format($eigen, 6) }}</li>
+                    <li>{{ $penerimaanzakat[$index]->nama }}: {{ number_format($eigen, 6) }}</li>
                 @endforeach
             </ul>
-            <p><strong>Total : {{ number_format($sumEigenVector, 0) }}</strong></p>
+            <p><strong>Total: {{ number_format($sumEigenVector, 6) }}</strong></p>
+
             <table class="table mt-4">
                 <tr>
                     <td>Lambda Max</td>
@@ -157,5 +158,6 @@
             </table>
         </div>
     </div>
+
     </div>
 @endsection

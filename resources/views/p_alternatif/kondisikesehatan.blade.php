@@ -111,7 +111,7 @@
                     <tr>
                         <td><strong>Total</strong></td>
                         @foreach ($columnTotals as $total)
-                            <td><strong>{{ number_format($total, 2) + 1 }} </strong></td>
+                            <td><strong>{{ number_format($total, 2) }} </strong></td>
                         @endforeach
                     </tr>
                 </tbody>
@@ -133,14 +133,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for ($i = 0; $i < count($normalizedMatrix); $i++)
+                    @foreach ($normalizedMatrix as $i => $row)
                         <tr>
                             <td>{{ $penerimaZakat[$i]->nama }}</td>
-                            @for ($j = 0; $j < count($normalizedMatrix[$i]); $j++)
-                                <td>{{ number_format($normalizedMatrix[$i][$j], 6) }}</td>
-                            @endfor
+                            @foreach ($row as $j => $value)
+                                <td>{{ number_format($value, 6) }}</td>
+                            @endforeach
                         </tr>
-                    @endfor
+                    @endforeach
                 </tbody>
             </table>
 
@@ -150,14 +150,14 @@
                     <li>{{ $penerimaZakat[$index]->nama }}: {{ number_format($eigen, 6) }}</li>
                 @endforeach
             </ul>
-            @if($sumEigenVector > 1)
-            <div class="alert alert-danger" role="alert">
-                <strong>Warning:</strong> Eigen vector sum is greater than 1!
-            </div>
-        @endif
-        
-        <p><strong>Total: {{ number_format($sumEigenVector, 0) }}</strong></p>
-        
+            @if ($sumEigenVector > 1)
+                <div class="alert alert-danger" role="alert">
+                    <strong>Warning:</strong> Eigen vector sum is greater than 1!
+                </div>
+            @endif
+
+            <p><strong>Total: {{ number_format($sumEigenVector, 6) }}</strong></p>
+
             <table class="table mt-4">
                 <tr>
                     <td>Lambda Max</td>

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\PenerimaanZakat;
 use App\Models\perbandinganTempatTinggal;
 
-class perbandinganTempatTinggalController extends Controller
+class PerbandinganTempatTinggalController extends Controller
 {
     public function index()
     {
@@ -94,6 +94,7 @@ class perbandinganTempatTinggalController extends Controller
             if (!isset($idToIndex[$perbandingan->kriteria1_id]) || !isset($idToIndex[$perbandingan->kriteria2_id])) {
                 continue;
             }
+
             $i = $idToIndex[$perbandingan->kriteria1_id];
             $j = $idToIndex[$perbandingan->kriteria2_id];
 
@@ -105,10 +106,25 @@ class perbandinganTempatTinggalController extends Controller
                 $matrix[$j][$i] = round($perbandingan->nilai, 2);
             }
 
+            // Tambahkan nilai ke total kolom
             $columnTotals[$j] += $matrix[$i][$j];
             $columnTotals[$i] += $matrix[$j][$i];
         }
+
+        // Pastikan nilai diagonal (i == j) adalah 1, dan tambahkan ke total kolom
+        foreach ($idToIndex as $index) {
+            $matrix[$index][$index] = 1;
+            $columnTotals[$index] += 1;  // Pastikan total kolom juga menambahkan nilai 1 untuk diagonal
+        }
+
+        // Pastikan setiap kolom memiliki total minimal 1
+        foreach ($columnTotals as $index => $total) {
+            if ($total == 0) {
+                $columnTotals[$index] = 1;
+            }
+        }
     }
+
 
     private function calculateNormalizedMatrix($matrix, $columnTotals, $size)
     {
