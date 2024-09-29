@@ -66,6 +66,17 @@ class ComparisonHelper
             $columnTotals[$j] += $matrix[$i][$j];
             $columnTotals[$i] += $matrix[$j][$i];
         }
+        foreach ($idToIndex as $index) {
+            $matrix[$index][$index] = 1;
+            $columnTotals[$index] += 1;  // Pastikan total kolom juga menambahkan nilai 1 untuk diagonal
+        }
+
+        // Pastikan setiap kolom memiliki total minimal 1
+        foreach ($columnTotals as $index => $total) {
+            if ($total == 0) {
+                $columnTotals[$index] = 1;
+            }
+        }
     }
 
     private static function calculateNormalizedMatrix($matrix, $columnTotals, $size)

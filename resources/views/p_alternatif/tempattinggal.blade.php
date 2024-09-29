@@ -15,8 +15,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($penerimaanzakat as $k1)
-                                @foreach ($penerimaanzakat as $k2)
+                            @foreach ($penerimaZakat as $k1)
+                                @foreach ($penerimaZakat as $k2)
                                     @if ($k1->id < $k2->id)
                                         @php
                                             $key = $k1->id . '-' . $k2->id;
@@ -78,16 +78,16 @@
                 <thead>
                     <tr>
                         <th>Kriteria</th>
-                        @foreach ($penerimaanzakat as $k)
+                        @foreach ($penerimaZakat as $k)
                             <th>{{ $k->nama }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($penerimaanzakat as $i => $k1)
+                    @foreach ($penerimaZakat as $i => $k1)
                         <tr>
                             <td>{{ $k1->nama }}</td>
-                            @foreach ($penerimaanzakat as $j => $k2)
+                            @foreach ($penerimaZakat as $j => $k2)
                                 <td>
                                     @if (intval($matrix[$i][$j]) == $matrix[$i][$j])
                                         {{ intval($matrix[$i][$j]) }} {{-- Tampilkan tanpa desimal jika bilangan bulat --}}
@@ -117,7 +117,7 @@
                 <thead>
                     <tr>
                         <th>Kriteria</th>
-                        @foreach ($penerimaanzakat as $krit)
+                        @foreach ($penerimaZakat as $krit)
                             <th>{{ $krit->nama }}</th>
                         @endforeach
                     </tr>
@@ -125,7 +125,7 @@
                 <tbody>
                     @foreach ($normalizedMatrix as $i => $row)
                         <tr>
-                            <td>{{ $penerimaanzakat[$i]->nama }}</td>
+                            <td>{{ $penerimaZakat[$i]->nama }}</td>
                             @foreach ($row as $j => $value)
                                 <td>{{ number_format($value, 6) }}</td>
                             @endforeach
@@ -137,10 +137,10 @@
             <h5>Rata-rata (Prioritas Bobot)</h5>
             <ul>
                 @foreach ($eigenVector as $index => $eigen)
-                    <li>{{ $penerimaanzakat[$index]->nama }}: {{ number_format($eigen, 6) }}</li>
+                    <li>{{ $penerimaZakat[$index]->nama }}: {{ number_format($eigen, 6) }}</li>
                 @endforeach
             </ul>
-            <p><strong>Total: {{ number_format($sumEigenVector, 6) }}</strong></p>
+            <p><strong>Total : {{ number_format(array_sum($eigenVector), 6) }}</strong></p>
 
             <table class="table mt-4">
                 <tr>

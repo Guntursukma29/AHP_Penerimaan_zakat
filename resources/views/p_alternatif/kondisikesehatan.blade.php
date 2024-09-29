@@ -150,13 +150,13 @@
                     <li>{{ $penerimaZakat[$index]->nama }}: {{ number_format($eigen, 6) }}</li>
                 @endforeach
             </ul>
-            @if ($sumEigenVector > 1)
+            @if ($eigenVector > 1)
                 <div class="alert alert-danger" role="alert">
                     <strong>Warning:</strong> Eigen vector sum is greater than 1!
                 </div>
             @endif
 
-            <p><strong>Total: {{ number_format($sumEigenVector, 6) }}</strong></p>
+            <p><strong>Total : {{ number_format(array_sum($eigenVector), 6) }}</strong></p>
 
             <table class="table mt-4">
                 <tr>
