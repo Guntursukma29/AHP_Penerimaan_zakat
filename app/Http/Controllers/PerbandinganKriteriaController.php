@@ -12,19 +12,26 @@ class PerbandinganKriteriaController extends Controller
     {
         $kriteria = Kriteria::all();
         $size = $kriteria->count();
+
+        // Inisialisasi idToIndex: Pemetaan dari kriteria ID ke indeks matriks
+        $idToIndex = [];
+        foreach ($kriteria as $index => $kriteriaItem) {
+            $idToIndex[$kriteriaItem->id] = $index;
+        }
+
         $matrix = $this->initializeMatrix($size);
         $columnTotals = array_fill(0, $size, 0);
 
         $perbandinganKriteria = PerbandinganKriteria::all();
        
-        $this->fillMatrixAndColumnTotals($perbandinganKriteria, $matrix, $columnTotals);
+        $this->fillMatrixAndColumnTotals($perbandinganKriteria, $matrix, $columnTotals, $idToIndex);
         $normalizedMatrix = $this->calculateNormalizedMatrix($matrix, $columnTotals, $size);
         $eigenVector = $this->calculateEigenVector($normalizedMatrix, $size);
         $lambdaMax = $this->calculateLambdaMax($columnTotals, $eigenVector, $size);
         $sumEigenVector = array_sum($eigenVector);
 
         $ci = ($lambdaMax - $size) / ($size - 1);
-        $ir = 1.12;
+        $ir = 1.12; // Ubah sesuai nilai IR untuk ukuran matriks
         $cr = $ci / $ir;
 
         $perbandinganArray = $this->getPerbandinganArray($perbandinganKriteria);
@@ -60,16 +67,20 @@ class PerbandinganKriteriaController extends Controller
 
         return redirect()->back()->with('success', 'Perbandingan kriteria berhasil disimpan.');
     }
+
     private function initializeMatrix($size)
     {
         return array_fill(0, $size, array_fill(0, $size, 1));
     }
 
-    private function fillMatrixAndColumnTotals($perbandinganKriteria, &$matrix, &$columnTotals)
+    private static function fillMatrixAndColumnTotals($perbandinganKriteria, &$matrix, &$columnTotals, $idToIndex)
     {
         foreach ($perbandinganKriteria as $perbandingan) {
-            $i = $perbandingan->kriteria1_id - 1;
-            $j = $perbandingan->kriteria2_id - 1;
+            if (!isset($idToIndex[$perbandingan->kriteria1_id]) || !isset($idToIndex[$perbandingan->kriteria2_id])) {
+                continue;
+            }
+            $i = $idToIndex[$perbandingan->kriteria1_id];
+            $j = $idToIndex[$perbandingan->kriteria2_id];
 
             if ($perbandingan->selected_kriteria_id == $perbandingan->kriteria1_id) {
                 $matrix[$i][$j] = round($perbandingan->nilai, 2);
@@ -83,6 +94,16 @@ class PerbandinganKriteriaController extends Controller
             $columnTotals[$i] += $matrix[$j][$i];
         }
 
+        foreach ($idToIndex as $index) {
+            $matrix[$index][$index] = 1;
+            $columnTotals[$index] += 1;  // Tambahkan nilai 1 untuk diagonal
+        }
+
+        foreach ($columnTotals as $index => $total) {
+            if ($total == 0) {
+                $columnTotals[$index] = 1;
+            }
+        }
     }
 
     private function calculateNormalizedMatrix($matrix, $columnTotals, $size)
@@ -97,6 +118,7 @@ class PerbandinganKriteriaController extends Controller
         }
         return $normalizedMatrix;
     }
+
     private function calculateEigenVector($normalizedMatrix, $size)
     {
         $eigenVector = array_fill(0, $size, 0);
