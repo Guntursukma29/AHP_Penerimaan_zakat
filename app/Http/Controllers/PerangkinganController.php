@@ -5,13 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ComparisonHelper;
 use App\Models\Kriteria;
 use App\Models\PerbandinganKriteria;
-use App\Models\PerbandinganPekerjaan;
-use App\Models\PerbandinganPenghasilan;
-use App\Models\PerbandinganTempatTinggal;
-use App\Models\PerbandinganKondisiKesehatan;
-use App\Models\PerbandinganTanggunganKeluarga;
 use App\Models\PenerimaanZakat;
-use Illuminate\Http\Request;
 
 class PerangkinganController extends Controller
 {
@@ -21,7 +15,6 @@ class PerangkinganController extends Controller
         $hasilRataRata = $this->getHasilRataRata();
 
         $ranking = $this->calculateRanking($hasilRataRata, $rataRataKriteria);
-
         return view('hasil.perangkingan', [
             'hasilRataRata' => $hasilRataRata,
             'rataRataKriteria' => $rataRataKriteria,
@@ -56,21 +49,21 @@ class PerangkinganController extends Controller
         $penerimaZakat = PenerimaanZakat::all();
         $hasilRataRata = [];
 
-        foreach ($penerimaZakat as $penerima) {
+        foreach ($penerimaZakat as $index => $penerima) {
             $hasilRataRata[] = [
                 'penerima' => $penerima->nama,
-                'rata_pekerjaan' => $this->calculateRata('Pekerjaan', $penerima->id),
-                'rata_penghasilan' => $this->calculateRata('Penghasilan', $penerima->id),
-                'rata_tempattinggal' => $this->calculateRata('Tempat Tinggal', $penerima->id),
-                'rata_kondisi_kesehatan' => $this->calculateRata('Kondisi Kesehatan', $penerima->id),
-                'rata_tanggungan_keluarga' => $this->calculateRata('Tanggungan Keluarga', $penerima->id),
+                'rata_pekerjaan' => $this->calculateRata('Pekerjaan', $index),
+                'rata_penghasilan' => $this->calculateRata('Penghasilan', $index),
+                'rata_tempattinggal' => $this->calculateRata('TempatTinggal', $index),
+                'rata_kondisi_kesehatan' => $this->calculateRata('KondisiKesehatan', $index),
+                'rata_tanggungan_keluarga' => $this->calculateRata('TanggunganKeluarga', $index),
             ];
         }
 
         return $hasilRataRata;
     }
 
-    private function calculateRata($type, $id)
+    private function calculateRata($type, $penerimaZakatIndex)
     {
         $modelClass = 'App\\Models\\Perbandingan' . str_replace(' ', '', ucwords(strtolower($type)));
         $perbandingan = $modelClass::all();
@@ -79,13 +72,13 @@ class PerangkinganController extends Controller
         $calculations = ComparisonHelper::calculateComparison($size, PenerimaanZakat::all(), $perbandingan);
         $eigenVector = $calculations['eigenVector'];
 
-        return $eigenVector[$id] ?? 0;
+        return $eigenVector[$penerimaZakatIndex] ?? 0;
     }
+
 
     private function calculateRanking($hasilRataRata, $rataRataKriteria)
     {
         $ranking = [];
-
         foreach ($hasilRataRata as $rata) {
             $total = (
                 $rata['rata_pekerjaan'] * $rataRataKriteria['Pekerjaan'] +

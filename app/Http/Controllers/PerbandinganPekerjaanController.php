@@ -19,7 +19,6 @@ class PerbandinganPekerjaanController extends Controller
 
         $comparisonResults = ComparisonHelper::calculateComparison($size, $penerimaZakat, $perbandinganPekerjaan);
 
-        // Ambil hasil perhitungan dari helper
         $matrix = $comparisonResults['matrix'];
         $columnTotals = $comparisonResults['columnTotals'];
         $normalizedMatrix = $comparisonResults['normalizedMatrix'];

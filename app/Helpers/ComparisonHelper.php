@@ -39,8 +39,6 @@ class ComparisonHelper
         return $perbandinganArray;
     }
 
-    // Existing methods...
-
     private static function initializeMatrix($size)
     {
         return array_fill(0, $size, array_fill(0, $size, 1));
@@ -68,10 +66,9 @@ class ComparisonHelper
         }
         foreach ($idToIndex as $index) {
             $matrix[$index][$index] = 1;
-            $columnTotals[$index] += 1;  // Pastikan total kolom juga menambahkan nilai 1 untuk diagonal
+            $columnTotals[$index] += 1; 
         }
 
-        // Pastikan setiap kolom memiliki total minimal 1
         foreach ($columnTotals as $index => $total) {
             if ($total == 0) {
                 $columnTotals[$index] = 1;
