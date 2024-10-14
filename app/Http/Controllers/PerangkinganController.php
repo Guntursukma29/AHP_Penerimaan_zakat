@@ -6,6 +6,7 @@ use App\Helpers\ComparisonHelper;
 use App\Models\Kriteria;
 use App\Models\PerbandinganKriteria;
 use App\Models\PenerimaanZakat;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PerangkinganController extends Controller
 {
@@ -97,5 +98,19 @@ class PerangkinganController extends Controller
         usort($ranking, fn($a, $b) => $b['total'] <=> $a['total']);
 
         return $ranking;
+    }
+    public function generatePDF()
+    {
+        $rataRataKriteria = $this->getRataRataKriteria();
+        $hasilRataRata = $this->getHasilRataRata();
+        $ranking = $this->calculateRanking($hasilRataRata, $rataRataKriteria);
+
+        $pdf = PDF::loadView('hasil.pdf', [
+            'hasilRataRata' => $hasilRataRata,
+            'rataRataKriteria' => $rataRataKriteria,
+            'ranking' => $ranking,
+        ]);
+
+        return $pdf->download('laporan_penerima_zakat.pdf');
     }
 }

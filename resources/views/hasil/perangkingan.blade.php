@@ -5,6 +5,9 @@
         <div class="card-body">
             <h4 class="fw-semibold text-center mb-4">Rata-rata Nilai Per Alternatif di Semua Kriteria</h4>
             <div class="table-responsive">
+                
+    <a href="{{ route('cetak.pdf') }}" class="btn btn-primary mb-4" target="_blank">Cetak PDF</a>
+
                 <table class="table table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
@@ -60,29 +63,46 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>Nama Penerima</th>
+                                    <th>Detail Perhitungan</th>
                                     <th>Total Skor</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($hasilRataRata as $rata)
                                     @php
-                                        $total =
-                                            $rata['rata_pekerjaan'] * $rataRataKriteria['Pekerjaan'] +
-                                            $rata['rata_penghasilan'] * $rataRataKriteria['Penghasilan'] +
-                                            $rata['rata_tempattinggal'] * $rataRataKriteria['Tempat Tinggal'] +
-                                            $rata['rata_kondisi_kesehatan'] * $rataRataKriteria['Kondisi Kesehatan'] +
-                                            $rata['rata_tanggungan_keluarga'] *
-                                                $rataRataKriteria['Tanggungan Keluarga'];
+                                        $detailPerhitungan = [
+                                            'Pekerjaan' =>
+                                                round($rata['rata_pekerjaan'], 2) *
+                                                round($rataRataKriteria['Pekerjaan'], 2),
+                                            'Penghasilan' =>
+                                                round($rata['rata_penghasilan'], 2) *
+                                                round($rataRataKriteria['Penghasilan'], 2),
+                                            'Tempat Tinggal' =>
+                                                round($rata['rata_tempattinggal'], 2) *
+                                                round($rataRataKriteria['Tempat Tinggal'], 2),
+                                            'Kondisi Kesehatan' =>
+                                                round($rata['rata_kondisi_kesehatan'], 2) *
+                                                round($rataRataKriteria['Kondisi Kesehatan'], 2),
+                                            'Tanggungan Keluarga' =>
+                                                round($rata['rata_tanggungan_keluarga'], 2) *
+                                                round($rataRataKriteria['Tanggungan Keluarga'], 2),
+                                        ];
+                                        $total = array_sum($detailPerhitungan);
                                     @endphp
+
                                     <tr>
                                         <td>{{ $rata['penerima'] }}</td>
-                                        <td>{{ number_format($total, 2) }}</td>
+                                        <td>
+                                            @foreach ($detailPerhitungan as $kriteria => $nilai)
+                                                {{ $kriteria }}: {{ number_format($nilai, 4) }}<br>
+                                            @endforeach
+                                        </td>
+                                        <td>{{ number_format($total, 4) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-
                 </div>
                 <div class="col-md-4">
 
@@ -101,7 +121,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $rank['penerima'] }}</td>
-                                        <td>{{ number_format($rank['total'], 2) }}</td>
+                                        <td>{{ number_format($rank['total'], 4) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

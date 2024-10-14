@@ -49,7 +49,7 @@
                                                 <td>
                                                     <input type="number"
                                                         name="nilai[{{ $k1->id }}][{{ $k2->id }}]"
-                                                        class="form-control" value="{{ $nilai }}" required>
+                                                        class="form-control" value="{{ number_format($nilai, 0) }}" required>
                                                 </td>
                                             </tr>
                                         @endif
@@ -86,9 +86,9 @@
                                 @foreach ($kriteria as $j => $k2)
                                     <td>
                                         @if (intval($matrix[$i][$j]) == $matrix[$i][$j])
-                                            {{ intval($matrix[$i][$j]) }} {{-- Tampilkan tanpa desimal jika bilangan bulat --}}
+                                            {{ intval($matrix[$i][$j]) }}
                                         @else
-                                            {{ number_format($matrix[$i][$j], 2) }} {{-- Tampilkan dengan 2 desimal jika ada desimal yang bukan nol --}}
+                                            {{ number_format($matrix[$i][$j], 2) }}
                                         @endif
                                     </td>
                                 @endforeach

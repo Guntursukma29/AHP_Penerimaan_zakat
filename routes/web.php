@@ -46,4 +46,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/perbandingan-kondisikesehatan', [PerbandinganKondisiKesehatanController::class, 'index'])->name('perbandingankondisikesehatan');
     Route::post('/submit-perbandingankondisikesehatan', [PerbandinganKondisiKesehatanController::class, 'store']);
     Route::get('/hasil-perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan');
+    Route::get('/cetak-pdf', [PerangkinganController::class, 'generatePDF'])->name('cetak.pdf');
+
 });

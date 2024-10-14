@@ -89,9 +89,9 @@
                             @foreach ($penerimaZakat as $j => $k2)
                                 <td>
                                     @if (intval($matrix[$i][$j]) == $matrix[$i][$j])
-                                        {{ intval($matrix[$i][$j]) }} {{-- Tampilkan tanpa desimal jika bilangan bulat --}}
+                                        {{ intval($matrix[$i][$j]) }} 
                                     @else
-                                        {{ number_format($matrix[$i][$j], 2) }} {{-- Tampilkan dengan 2 desimal jika ada desimal yang bukan nol --}}
+                                        {{ number_format($matrix[$i][$j], 2) }} 
                                     @endif
                                 </td>
                             @endforeach

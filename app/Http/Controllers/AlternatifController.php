@@ -33,16 +33,13 @@ class AlternatifController extends Controller
     {
         $dataPenerimaZakat = PenerimaanZakat::findOrFail($request->data_penerima_zakat_id);
     
-        // Hapus sub-kriteria yang lama jika ada
-        $dataPenerimaZakat->subKriteria()->detach(); // Use detach for many-to-many
-    
-        // Simpan nilai sub-kriteria baru
+        $dataPenerimaZakat->subKriteria()->detach(); 
         foreach ($request->sub_kriteria as $kriteria_id => $sub_kriteria_id) {
-            if ($sub_kriteria_id) {  // Pastikan sub_kriteria_id tidak kosong
+            if ($sub_kriteria_id) { 
                 $subKriteria = \App\Models\SubKriteria::find($sub_kriteria_id);
                 if ($subKriteria) {
                     $dataPenerimaZakat->subKriteria()->attach($sub_kriteria_id, [
-                        'kriteria_id' => $kriteria_id,  // Ensure kriteria_id is included
+                        'kriteria_id' => $kriteria_id,  
                         'nilai' => $this->getSubKriteriaValue($sub_kriteria_id),
                     ]);
                 }
@@ -85,16 +82,12 @@ class AlternatifController extends Controller
     }
     public function getSubKriteriaValue($sub_kriteria_id)
 {
-    // Contoh logika untuk mendapatkan nilai berdasarkan sub_kriteria_id
     $subKriteria = \App\Models\SubKriteria::find($sub_kriteria_id);
     
-    // Pastikan sub_kriteria ditemukan
     if ($subKriteria) {
-        return $subKriteria->nilai;  // Atau logika lain yang sesuai
+        return $subKriteria->nilai; 
     }
-
-    // Jika sub_kriteria tidak ditemukan, kembalikan nilai default
-    return 0;  // Contoh nilai default
+    return 0; 
 }
 
 }
